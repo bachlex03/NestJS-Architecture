@@ -3,9 +3,11 @@ import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
 import helmet from 'helmet';
 import * as compression from 'compression';
+import { HttpExceptionFilter } from './http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Security middleware
   // prevent common security vulnerabilities by setting HTTP headers appropriately

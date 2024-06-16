@@ -5,7 +5,5 @@ import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly ConfigService: ConfigService) {
-    console.log('ConfigService', ConfigService.get('PORT'));
-  }
+  constructor(private readonly ConfigService: ConfigService) {}
 }
