@@ -9,7 +9,7 @@ import mongoose, {
 } from 'mongoose';
 import { EntityBase } from 'src/cores/repository/entity.base';
 import { RepositoryInterface } from 'src/cores/repository/repository.interface';
-import { User } from 'src/modules/users/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { BadRequestException } from '../exceptions/bad-request.exception';
 import * as dayjs from 'dayjs';
 
@@ -30,10 +30,10 @@ export abstract class RepositoryAbstract<T extends EntityBase>
     return results;
   }
 
-  async findOneWithCondition(filter: FilterQuery<T>): Promise<T> {
+  async findOneWithCondition(filter: FilterQuery<T> = {}): Promise<T> {
     const result = (await this.model.findOne(filter).lean().exec()) as T;
 
-    return result.deleted_at ? null : result;
+    return result?.deleted_at ? null : result;
   }
 
   async findOneDeleted(filter: FilterQuery<T>): Promise<T> {
@@ -75,38 +75,36 @@ export abstract class RepositoryAbstract<T extends EntityBase>
     const objectId = new mongoose.Types.ObjectId(id);
 
     const result = await this.model
-      .updateOne(
-        { _id: objectId, deleted_at: { $ne: null } } as FilterQuery<T>,
+      .findOneAndDelete(
+        { _id: objectId, deleted_at: { $ne: null } },
         { deleted_at: dayjs() },
       )
-      .lean()
-      .exec();
+      .lean();
 
-    return result.modifiedCount > 0;
+    return result.deleted_at !== null;
   }
 
   async restore(id: string): Promise<boolean> {
     const objectId = new mongoose.Types.ObjectId(id);
 
     const result = await this.model
-      .updateOne(
-        { _id: objectId, deleted_at: { $ne: null } } as FilterQuery<T>,
+      .findOneAndUpdate(
+        { _id: objectId, deleted_at: { $ne: null } },
         { deleted_at: null },
+        { new: true },
       )
-      .lean()
-      .exec();
+      .lean();
 
-    return result.modifiedCount > 0;
+    return result.deleted_at === null;
   }
 
   async hardDelete(id: string): Promise<boolean> {
     const objectId = new mongoose.Types.ObjectId(id);
 
     const result = await this.model
-      .deleteOne({ _id: objectId, deleted_at: { $ne: null } } as FilterQuery<T>)
-      .lean()
-      .exec();
+      .findOneAndDelete({ _id: objectId, deleted_at: { $ne: null } })
+      .lean();
 
-    return result.deletedCount > 0;
+    return !!result;
   }
 }

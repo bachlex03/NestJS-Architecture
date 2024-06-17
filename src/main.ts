@@ -21,7 +21,7 @@ async function bootstrap() {
   // Compression reduce the size of the response body and increase the speed of a web app
   app.use(compression());
 
-  app.enableCors({ origin: configService.get('FRONTEND_URL') });
+  app.enableCors({ origin: configService.get('FRONTEND_URL') as string });
 
   // Swagger configurations
   swaggerConfigurations(app);

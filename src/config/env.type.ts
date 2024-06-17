@@ -8,4 +8,6 @@ export type EnvironmentFields = {
   DB_PASSWORD: string;
 
   FRONTEND_URL: string;
+
+  SALT_OR_ROUNDS: number;
 };

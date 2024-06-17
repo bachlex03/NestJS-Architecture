@@ -37,11 +37,12 @@ export class ConfigService {
     this.ENV_PATH = path.resolve(
       __dirname,
       '../../',
-      options.envFolder,
+      this.options.envFolder,
       this.ENV_FILE,
     );
 
     dotenv.config({ path: this.ENV_PATH });
+
     this._envConfig = {
       NODE_ENV: process.env.NODE_ENV,
       ENV_FILE: this.ENV_FILE,
@@ -54,7 +55,7 @@ export class ConfigService {
     }
   }
 
-  public get(key: keyof EnvironmentFields): string {
+  public get(key: keyof EnvironmentFields): string | number {
     let envData: Record<string, any> = {
       ...this._envConfig,
     };

@@ -23,6 +23,12 @@ export class User extends EntityBase {
   id: string;
 
   @Prop()
+  email: string;
+
+  @Prop()
+  password: string;
+
+  @Prop()
   firstName: string;
 
   @Prop()
