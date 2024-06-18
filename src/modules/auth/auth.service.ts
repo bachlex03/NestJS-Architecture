@@ -5,6 +5,8 @@ import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from 'src/config/config.service';
 import { SignInDto } from './dto/sign-in.dto';
+import { JwtPayload } from 'src/cores/strategies/jwt-payload';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signUp(dto: SignUpDto) {
@@ -32,7 +35,19 @@ export class AuthService {
     return user;
   }
 
-  async signIn(dto: SignInDto) {}
+  async signIn(user: User) {
+    const payload: JwtPayload = {
+      userId: user.id,
+      email: user.email,
+    };
+
+    const [accessToken, refreshToken] = this.generateTokenPair(payload);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
 
   async signOut() {}
 
@@ -43,7 +58,7 @@ export class AuthService {
   async changePassword() {}
 
   // internal methods
-  async validateUser(email: string, password: string): Promise<User> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.userService.findOneByEmail(email);
 
     if (!user) {
@@ -57,5 +72,26 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  generateAccessToken(payload: JwtPayload) {
+    return this.jwtService.sign(payload, {
+      secret: `${this.configService.get('JWT_SECRET')}`,
+      expiresIn: `${this.configService.get('JWT_AT_EXPIRES_IN')}`,
+    });
+  }
+
+  generateRefreshToken(payload: JwtPayload) {
+    return this.jwtService.sign(payload, {
+      secret: `${this.configService.get('JWT_SECRET')}`,
+      expiresIn: `${this.configService.get('JWT_RT_EXPIRES_IN')}`,
+    });
+  }
+
+  generateTokenPair(payload: JwtPayload): [string, string] {
+    const accessToken = this.generateAccessToken(payload);
+    const refreshToken = this.generateRefreshToken(payload);
+
+    return [accessToken, refreshToken];
   }
 }
