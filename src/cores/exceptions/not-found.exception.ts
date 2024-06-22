@@ -5,3 +5,10 @@ export class NotFoundException extends HttpException {
     super(message || 'Not Found !', HttpStatus.NOT_FOUND);
   }
 }
+
+// USER EXCEPTIONS
+export class UserNotFoundException extends NotFoundException {
+  constructor(message: string = 'User Not Found !') {
+    super(message);
+  }
+}

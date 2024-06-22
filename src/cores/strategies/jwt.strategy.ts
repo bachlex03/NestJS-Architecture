@@ -3,10 +3,14 @@ import { ExtractJwt, Strategy as Jwt } from 'passport-jwt';
 import { ConfigService } from 'src/config/config.service';
 import { JwtPayload } from './jwt-payload';
 import { Injectable } from '@nestjs/common';
+import { UserService } from 'src/modules/user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Jwt) {
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly userService: UserService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -14,7 +18,8 @@ export class JwtStrategy extends PassportStrategy(Jwt) {
     });
   }
   async validate(payload: JwtPayload) {
-    console.log('payload: ', payload);
-    return { test: 'test' };
+    const user = this.userService.originalFindOne({ email: payload.email });
+
+    return user;
   }
 }

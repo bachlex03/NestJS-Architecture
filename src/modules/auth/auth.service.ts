@@ -3,10 +3,17 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
+import * as dayjs from 'dayjs';
 import { ConfigService } from 'src/config/config.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { JwtPayload } from 'src/cores/strategies/jwt-payload';
 import { JwtService } from '@nestjs/jwt';
+import { UserNotFoundException } from 'src/cores/exceptions/not-found.exception';
+import {
+  UserDeletedException,
+  userExistException,
+} from 'src/cores/exceptions/bad-request.exception';
+import { ResponseInterface } from './auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -18,11 +25,14 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signUp(dto: SignUpDto) {
-    const userExist = await this.userService.findOneByEmail(dto.email);
+  async signUp(dto: SignUpDto): Promise<ResponseInterface> {
+    const userExist = await this.userService.originalFindOne({
+      email: dto.email,
+    });
 
+    // check if user exist
     if (userExist) {
-      return null;
+      throw new userExistException('Email already exist');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, this.saltOrRounds);
@@ -32,12 +42,8 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return user;
-  }
-
-  async signIn(user: User) {
     const payload: JwtPayload = {
-      userId: user.id,
+      user_id: user.id,
       email: user.email,
     };
 
@@ -49,6 +55,32 @@ export class AuthService {
     };
   }
 
+  async signIn(user: User): Promise<ResponseInterface> {
+    const payload: JwtPayload = {
+      user_id: user.id,
+      email: user.email,
+    };
+
+    const [accessToken, refreshToken] = this.generateTokenPair(payload);
+
+    let deleted_at = user?.deleted_at
+      ? dayjs(user.deleted_at).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+      : null;
+
+    let removed_at = user?.deleted_at
+      ? dayjs(user.deleted_at)
+          .add(this.configService.get('ACCOUNT_REMOVE_IN') as number, 'ms')
+          .format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+      : null;
+
+    return {
+      accessToken,
+      refreshToken,
+      deleted_at,
+      removed_at,
+    };
+  }
+
   async signOut() {}
 
   async forgotPassword() {}
@@ -57,9 +89,19 @@ export class AuthService {
 
   async changePassword() {}
 
+  async refreshToken() {}
+
+  async softDeleteUser(user: User) {}
+
+  async restoreUser() {}
+
+  async forceDeleteUser() {}
+
   // internal methods
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.originalFindOne({
+      email,
+    });
 
     if (!user) {
       return null;

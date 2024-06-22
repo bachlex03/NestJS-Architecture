@@ -25,4 +25,17 @@ export class UserService {
 
     return plainToClass(User, result);
   }
+
+  async softDelete(user: User): Promise<boolean> {
+    const result = await this.userRepository.softDelete(user.id);
+
+    return result;
+  }
+
+  // internal methods
+  async originalFindOne(filter: FilterQuery<User>): Promise<User> {
+    const result = await this.userRepository.findOne(filter);
+
+    return plainToClass(User, result);
+  }
 }

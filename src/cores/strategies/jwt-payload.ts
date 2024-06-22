@@ -1,6 +1,4 @@
 export class JwtPayload {
-  userId: string;
+  user_id: string;
   email: string;
-  accessToken?: string;
-  refreshToken?: string;
 }

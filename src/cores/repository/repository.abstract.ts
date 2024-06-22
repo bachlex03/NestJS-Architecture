@@ -18,6 +18,11 @@ export abstract class RepositoryAbstract<T extends EntityBase>
 {
   constructor(private model: Model<T>) {}
 
+  /*
+   * methods for data not deleted yet
+   * @condition deleted_at: null
+   * @returns Document where deleted_at is null
+   */
   async findOneById(id: string): Promise<T> {
     const result = (await this.model.findById(id).lean().exec()) as T;
 
@@ -25,7 +30,10 @@ export abstract class RepositoryAbstract<T extends EntityBase>
   }
 
   async findMany(filter: FilterQuery<T>): Promise<T[]> {
-    const results = (await this.model.find(filter).lean().exec()) as T[];
+    const results = (await this.model
+      .find({ ...filter, deleted_at: null })
+      .lean()
+      .exec()) as T[];
 
     return results;
   }
@@ -34,20 +42,6 @@ export abstract class RepositoryAbstract<T extends EntityBase>
     const result = (await this.model.findOne(filter).lean().exec()) as T;
 
     return result?.deleted_at ? null : result;
-  }
-
-  async findOneDeleted(filter: FilterQuery<T>): Promise<T> {
-    const result = (await this.model
-      .findOne({
-        ...filter,
-        deleted_at: {
-          $ne: null,
-        },
-      })
-      .lean()
-      .exec()) as T;
-
-    return result;
   }
 
   async create(data: object): Promise<T> {
@@ -68,6 +62,25 @@ export abstract class RepositoryAbstract<T extends EntityBase>
       .lean()
       .exec()) as T;
 
+    return result?.deleted_at ? null : result;
+  }
+
+  /*
+   * methods for data was deleted
+   * @condition deleted_at: { $ne: null}
+   * @returns Document where deleted_at is not null
+   */
+  async findOneDeleted(filter: FilterQuery<T>): Promise<T> {
+    const result = (await this.model
+      .findOne({
+        ...filter,
+        deleted_at: {
+          $ne: null,
+        },
+      })
+      .lean()
+      .exec()) as T;
+
     return result;
   }
 
@@ -75,13 +88,11 @@ export abstract class RepositoryAbstract<T extends EntityBase>
     const objectId = new mongoose.Types.ObjectId(id);
 
     const result = await this.model
-      .findOneAndDelete(
-        { _id: objectId, deleted_at: { $ne: null } },
-        { deleted_at: dayjs() },
-      )
-      .lean();
+      .updateOne({ _id: objectId, deleted_at: null }, { deleted_at: dayjs() })
+      .lean()
+      .exec();
 
-    return result.deleted_at !== null;
+    return result.modifiedCount > 0;
   }
 
   async restore(id: string): Promise<boolean> {
@@ -106,5 +117,12 @@ export abstract class RepositoryAbstract<T extends EntityBase>
       .lean();
 
     return !!result;
+  }
+
+  // internal methods
+  async findOne(filter: FilterQuery<T>): Promise<T> {
+    const result = (await this.model.findOne(filter).lean().exec()) as T;
+
+    return result;
   }
 }

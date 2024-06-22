@@ -42,3 +42,5 @@ export class User extends EntityBase {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ email: 1 }, { unique: true });

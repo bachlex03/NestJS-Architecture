@@ -14,4 +14,6 @@ export type EnvironmentFields = {
   JWT_SECRET: string;
   JWT_AT_EXPIRES_IN: string | number;
   JWT_RT_EXPIRES_IN: string | number;
+
+  ACCOUNT_REMOVE_IN: number;
 };
