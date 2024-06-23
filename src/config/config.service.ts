@@ -43,11 +43,18 @@ export class ConfigService {
 
     dotenv.config({ path: this.ENV_PATH });
 
+    const FINAL_ENV = {};
+
+    for (const key in dotenv.parse(fs.readFileSync(this.ENV_PATH))) {
+      FINAL_ENV[key] =
+        process.env[key] || dotenv.parse(fs.readFileSync(this.ENV_PATH))[key];
+    }
+
     this._envConfig = {
       NODE_ENV: process.env.NODE_ENV,
       ENV_FILE: this.ENV_FILE,
       ENV_PATH: this.ENV_PATH,
-      ...dotenv.parse(fs.readFileSync(this.ENV_PATH)),
+      ...FINAL_ENV,
     };
 
     for (const key in this._envConfig) {

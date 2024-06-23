@@ -1,0 +1,37 @@
+# base stage with lighter node image
+FROM node:20.11.1-alpine3.19 as base
+
+###################
+# BUILD FOR PRODUCTION
+###################
+FROM node:20.11.1-alpine3.19 as build  
+
+WORKDIR /usr/src/app
+
+COPY --chown=user ./package*.json .
+
+RUN npm ci --only=production && npm cache clean --force
+
+RUN npm install -g @nestjs/cli
+
+COPY . .
+
+RUN npm run build
+
+RUN rm -rf ./src
+
+USER node
+
+###################
+# PRODUCTION
+###################
+FROM base as production
+
+WORKDIR /usr/src/app
+
+COPY --chown=user --from=build /usr/src/app/dist ./dist
+COPY --chown=user --from=build /usr/src/app/node_modules ./node_modules
+COPY --chown=user --from=build /usr/src/app/package*.json .
+COPY --chown=user --from=build /usr/src/app/.env.* .
+
+CMD ["node", "dist/main.js"]
