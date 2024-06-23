@@ -7,6 +7,10 @@ export type EnvironmentFields = {
   DB_USERNAME: string;
   DB_PASSWORD: string;
 
+  REDIS_HOST: string;
+  REDIS_PORT: number;
+  REDIS_EMAIL_TTL: number;
+
   FRONTEND_URL: string;
 
   SALT_OR_ROUNDS: number;

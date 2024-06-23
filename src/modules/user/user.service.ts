@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfigService } from 'src/config/config.service';
 import { UserRepository } from './repository/user.repository';

@@ -6,6 +6,8 @@ import { ConfigModule } from './config/config.module';
 import { validate } from './config/env.validation';
 import { AuthModule } from './modules/auth/auth.module';
 import { DatabaseModule } from './cores/database/database.module';
+import { RedisModule } from './cores/database/redis.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { DatabaseModule } from './cores/database/database.module';
     UserModule,
     AuthModule,
     DatabaseModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

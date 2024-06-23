@@ -30,6 +30,6 @@ export class UserController {
   @Delete('soft')
   @UseGuards(JwtAuthGuard)
   async softDelete(@Req() req: Request) {
-    return this.userService.softDelete(req.user as User);
+    return this.userService.softDelete(req.user);
   }
 }

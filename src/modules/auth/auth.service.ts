@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as dayjs from 'dayjs';
 import { ConfigService } from 'src/config/config.service';
 import { SignInDto } from './dto/sign-in.dto';
-import { JwtPayload } from 'src/cores/strategies/jwt-payload';
+import { JwtPayload } from 'src/modules/auth/strategies/jwt-payload';
 import { JwtService } from '@nestjs/jwt';
 import { UserNotFoundException } from 'src/cores/exceptions/not-found.exception';
 import {
