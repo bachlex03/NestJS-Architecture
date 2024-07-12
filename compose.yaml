@@ -11,13 +11,13 @@ services:
       - redis:/data
 
   app:
-    image: baledev/nestjs-architecture
+    image: baledev/nestjs-architecture:latest
     container_name: nestjs-architecture
     build:
       context: .
       dockerfile: Dockerfile.production
     ports:
-      - '${PORT}:${PORT}'
+      - '5005:5005'
     environment:
       - DB_HOST=mongodb
       - REDIS_HOST=redis
