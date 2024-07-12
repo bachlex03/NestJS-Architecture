@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.production
-    image: baledev/nestjs-architecture
+    image: baledev/baledev/nestjs-architecture
     ports:
       - '${PORT}:${PORT}'
     environment:
