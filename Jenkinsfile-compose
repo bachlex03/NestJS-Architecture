@@ -16,7 +16,7 @@ pipeline {
                     sh "pwd && ls -la"
                     sh "ls -la ${WORKSPACE}"
 
-                    sh 'docker compose --env-file .env.development -f "compose.yaml" up -d --build'
+                    sh 'docker compose -f "compose.yaml" up -d --build'
                     sh 'docker compose push'
                 }
             }
