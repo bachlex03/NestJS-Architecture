@@ -12,10 +12,10 @@ services:
 
   app:
     container_name: nestjs-architecture
-    image: baledev/nestjs-architecture
     build:
       context: .
       dockerfile: Dockerfile.production
+    image: baledev/nestjs-architecture
     ports:
       - '${PORT}:${PORT}'
     environment:
