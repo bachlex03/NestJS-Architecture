@@ -13,6 +13,9 @@ pipeline {
             steps {
                 withDockerRegistry(credentialsId: 'dockerhub-jenkins-credential', url: 'https://index.docker.io/v1/') {
                     sh "cp -r /env ${WORKSPACE}/.env.development"
+                    sh "pwd && ls -la"
+                    sh "ls -la ${WORKSPACE}"
+
                     sh 'docker compose --env-file .env.development -f "compose.yaml" up -d --build'
                     sh 'docker compose push'
                 }
