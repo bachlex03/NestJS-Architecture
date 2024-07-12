@@ -11,7 +11,7 @@ pipeline {
             steps {
                 withDockerRegistry(credentialsId: 'dockerhub-jenkins-credential', url: 'https://index.docker.io/v1/') {
                     echo "Packaging and pushing the Image"
-                    sh "docker build . -t baledev/nestjs-architecture -f Dockerfile.prodution"
+                    sh "docker build . -t baledev/nestjs-architecture -f Dockerfile.production"
                     sh "docker push baledev/nestjs-architecture"
                 }
             }
