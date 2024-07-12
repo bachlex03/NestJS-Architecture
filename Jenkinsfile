@@ -22,7 +22,10 @@ pipeline {
                 sh "docker network create dev || echo 'Network already exists'"
                 sh "docker container stop nestjs-architecture || echo 'No container running'"
                 sh "echo y | docker container prune"
-                
+
+                sh "pwd && ls -la"
+                sh "ls -la ${WORKSPACE}"
+
                 sh "docker image pull baledev/nestjs-architecture"
                 sh "docker container run -d --name nestjs-architecture -p 8081:8080 baledev/nestjs-architecture"
             }
@@ -35,5 +38,3 @@ pipeline {
         }
     }
 }
-
-//
