@@ -34,4 +34,4 @@ COPY --chown=user --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=user --from=build /usr/src/app/package*.json .
 COPY --chown=user --from=build /usr/src/app/.env.* .
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "NODE_ENV=development", "dist/main.js"]
