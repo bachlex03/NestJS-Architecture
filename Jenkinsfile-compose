@@ -1,5 +1,4 @@
 pipeline {
-
     agent any
 
     parameters {
@@ -7,34 +6,44 @@ pipeline {
     }
     stages {
         stage('Building/Deploying') {
-            when{
+            when {
                 environment name: 'ACTION', value: 'Build'
             }
             steps {
-                withDockerRegistry(credentialsId: 'dockerhub-jenkins-credential', url: 'https://index.docker.io/v1/') {
-                    sh "cp -r /env/.env.development ${WORKSPACE}/.env.development"
-                    sh "pwd && ls -la"
+                script {
+                    echo "Current workspace: ${WORKSPACE}"
                     sh "ls -la ${WORKSPACE}"
-                    sh "cat /env/.env.development"
-                    sh "cat Jenkinsfile-compose"
-                    sh "cat compose.yaml"
-                    
-                    sh 'docker compose --env-file /env/.env.development -f "compose.yaml" up -d --build'
-                    sh 'docker compose push'
+
+                    withDockerRegistry(credentialsId: 'dockerhub-jenkins-credential', url: 'https://index.docker.io/v1/') {
+                        // Ensure the environment file is copied correctly
+                        sh "cp -r /env/.env.development ${WORKSPACE}/.env.development"
+                        sh "pwd && ls -la"
+                        sh "ls -la ${WORKSPACE}"
+
+                        // Display contents for debugging
+                        sh "cat /env/.env.development"
+                        sh "cat Jenkinsfile-compose"
+                        sh "cat compose.yaml"
+
+                        // Explicitly set the PORT environment variable for Docker Compose
+                        withEnv(["PORT=5005"]) {  // Set the PORT value here as per your .env.development
+                            sh 'docker compose --env-file /env/.env.development -f compose.yaml up -d --build'
+                            sh 'docker compose push'
+                        }
+                    }
                 }
             }
         }
         stage('Removing all') {
-            when{
+            when {
                 environment name: 'ACTION', value: 'Remove all'
             }
             steps {
-                sh 'docker compose down -v '
+                sh 'docker compose down -v'
             }
         }
     }
     post {
-        // Clean after build
         always {
             cleanWs()
         }

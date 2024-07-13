@@ -23,7 +23,7 @@ services:
       - DB_HOST=mongodb
       - REDIS_HOST=redis
     env_file:
-      - ./.env.development
+      - /env/.env.development
     depends_on:
       - redis
       - mongodb
