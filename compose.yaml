@@ -11,7 +11,7 @@ services:
       - redis:/data
 
   app:
-    image: baledev/nestjs-architecture:kat
+    image: baledev/nestjs-architecture:latest
     container_name: nestjs-architecture
     build:
       context: .
