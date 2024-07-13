@@ -23,7 +23,7 @@ pipeline {
                         sh "cat Jenkinsfile-compose"
                         sh "cat compose.yaml"
 
-                        sh "chmod +x .env.development"
+                        sh "chmod 777 ./.env.development"
 
                         sh 'docker compose --verbose --env-file ./.env.development -f compose.yaml up -d --build'
                         sh 'docker compose push'
