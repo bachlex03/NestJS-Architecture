@@ -15,7 +15,7 @@ pipeline {
                     sh "cp -r /env/.env.development ${WORKSPACE}/.env.development"
                     sh "pwd && ls -la"
                     sh "ls -la ${WORKSPACE}"
-                    sh "cat .env.development"
+                    sh "cat /env/.env.development"
                     sh "cat Jenkinsfile-compose"
                     sh "cat compose.yaml"
                     
