@@ -19,6 +19,7 @@ services:
     ports:
       - '${PORT}:${PORT}'
     environment:
+      - NODE_ENV=development
       - DB_HOST=mongodb
       - REDIS_HOST=redis
     env_file:
