@@ -23,10 +23,8 @@ pipeline {
                         sh "cat Jenkinsfile-compose"
                         sh "cat compose.yaml"
 
-                        withEnv(["PORT=5005"]) {
-                            sh 'docker compose --env-file ./.env.development -f compose.yaml up -d --build'
-                            sh 'docker compose push'
-                        }
+                        sh 'docker compose --env-file ./.env.development -f compose.yaml up -d --build'
+                        sh 'docker compose push'
                     }
                 }
             }

@@ -32,3 +32,5 @@ FROM base as development
 RUN mkdir /env
 
 COPY  .env.development /env
+
+USER jenkins
