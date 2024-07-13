@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 name: nestjs-architecture
 
 services:
@@ -11,7 +11,7 @@ services:
       - redis:/data
 
   app:
-    image: baledev/nestjs-architecture:latest
+    image: baledev/nestjs-architecture:kat
     container_name: nestjs-architecture
     build:
       context: .
